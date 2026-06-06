@@ -1,0 +1,1152 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Python OOP Quiz</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0d0d;
+    --surface: #141414;
+    --card: #1a1a1a;
+    --border: #2a2a2a;
+    --accent: #00ff88;
+    --accent2: #ff6b35;
+    --accent3: #4facfe;
+    --text: #f0f0f0;
+    --muted: #666;
+    --correct: #00ff88;
+    --wrong: #ff4444;
+    --pending: #ffd700;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* GRID BG */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: linear-gradient(rgba(0,255,136,0.03) 1px, transparent 1px),
+                      linear-gradient(90deg, rgba(0,255,136,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* HEADER */
+  header {
+    position: relative;
+    z-index: 10;
+    padding: 40px 24px 0;
+    text-align: center;
+  }
+
+  .logo {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 4px;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 16px;
+    opacity: 0.8;
+  }
+
+  h1 {
+    font-size: clamp(28px, 5vw, 52px);
+    font-weight: 800;
+    line-height: 1.1;
+    background: linear-gradient(135deg, #fff 0%, var(--accent) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 8px;
+  }
+
+  .subtitle {
+    color: var(--muted);
+    font-size: 14px;
+    font-family: 'Space Mono', monospace;
+  }
+
+  /* SCORE BAR */
+  .score-bar {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(13,13,13,0.95);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--border);
+    padding: 12px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  .score-info {
+    font-family: 'Space Mono', monospace;
+    font-size: 13px;
+    color: var(--accent);
+  }
+
+  .progress-wrap {
+    flex: 1;
+    max-width: 300px;
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--accent3));
+    border-radius: 2px;
+    transition: width 0.4s ease;
+    width: 0%;
+  }
+
+  .score-num {
+    font-family: 'Space Mono', monospace;
+    font-size: 13px;
+    color: var(--text);
+  }
+
+  /* NAV TABS */
+  .nav-section {
+    position: relative;
+    z-index: 10;
+    padding: 32px 24px 0;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  .chapter-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+  }
+
+  .chapter-btn {
+    padding: 10px 20px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--muted);
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 1px;
+    cursor: pointer;
+    border-radius: 6px;
+    transition: all 0.2s;
+    text-transform: uppercase;
+  }
+
+  .chapter-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .chapter-btn.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #000;
+    font-weight: 700;
+  }
+
+  .type-tabs {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+
+  .type-btn {
+    padding: 7px 14px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--muted);
+    font-family: 'Syne', sans-serif;
+    font-size: 12px;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: all 0.2s;
+  }
+
+  .type-btn:hover { border-color: var(--accent2); color: var(--accent2); }
+  .type-btn.active {
+    background: var(--accent2);
+    border-color: var(--accent2);
+    color: #fff;
+    font-weight: 600;
+  }
+
+  /* MAIN CONTENT */
+  main {
+    position: relative;
+    z-index: 10;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 24px 24px 80px;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .section-tag {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 3px;
+    background: var(--accent);
+    color: #000;
+    font-weight: 700;
+  }
+
+  .section-tag.tf { background: var(--pending); }
+  .section-tag.essay { background: var(--accent3); color: #000; }
+
+  .section-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  .q-count {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    margin-left: auto;
+  }
+
+  /* QUESTION CARD */
+  .q-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 16px;
+    transition: border-color 0.3s;
+    animation: fadeIn 0.3s ease;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .q-card.answered-correct { border-color: var(--correct); background: rgba(0,255,136,0.04); }
+  .q-card.answered-wrong { border-color: var(--wrong); background: rgba(255,68,68,0.04); }
+  .q-card.answered-partial { border-color: var(--pending); }
+
+  .q-num {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    margin-bottom: 10px;
+    letter-spacing: 1px;
+  }
+
+  .q-text {
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 1.5;
+    margin-bottom: 16px;
+    color: var(--text);
+  }
+
+  .q-code {
+    background: #0a0a0a;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 12px 16px;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: #a8d8a8;
+    margin-bottom: 14px;
+    white-space: pre-wrap;
+    line-height: 1.6;
+  }
+
+  /* MCQ OPTIONS */
+  .options {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .option-btn {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--surface);
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    font-size: 14px;
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.15s;
+    width: 100%;
+  }
+
+  .option-btn:hover:not(:disabled) {
+    border-color: var(--accent3);
+    background: rgba(79,172,254,0.06);
+    transform: translateX(3px);
+  }
+
+  .option-btn:disabled { cursor: default; }
+
+  .option-letter {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    min-width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    transition: all 0.15s;
+  }
+
+  .option-btn.correct { border-color: var(--correct); background: rgba(0,255,136,0.1); }
+  .option-btn.correct .option-letter { background: var(--correct); color: #000; border-color: var(--correct); }
+  .option-btn.wrong { border-color: var(--wrong); background: rgba(255,68,68,0.1); }
+  .option-btn.wrong .option-letter { background: var(--wrong); color: #fff; border-color: var(--wrong); }
+  .option-btn.reveal-correct { border-color: var(--correct); opacity: 0.7; }
+  .option-btn.reveal-correct .option-letter { border-color: var(--correct); color: var(--correct); }
+
+  .feedback {
+    margin-top: 12px;
+    padding: 10px 14px;
+    border-radius: 6px;
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    display: none;
+  }
+
+  .feedback.show { display: block; }
+  .feedback.correct { background: rgba(0,255,136,0.1); color: var(--correct); border: 1px solid rgba(0,255,136,0.2); }
+  .feedback.wrong { background: rgba(255,68,68,0.1); color: var(--wrong); border: 1px solid rgba(255,68,68,0.2); }
+
+  /* TRUE/FALSE */
+  .tf-options {
+    display: flex;
+    gap: 10px;
+  }
+
+  .tf-btn {
+    flex: 1;
+    padding: 14px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--surface);
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .tf-btn:hover:not(:disabled) { transform: translateY(-2px); }
+  .tf-btn.true-btn:hover:not(:disabled) { border-color: var(--correct); color: var(--correct); }
+  .tf-btn.false-btn:hover:not(:disabled) { border-color: var(--wrong); color: var(--wrong); }
+  .tf-btn:disabled { cursor: default; }
+  .tf-btn.correct { border-color: var(--correct); background: rgba(0,255,136,0.1); color: var(--correct); }
+  .tf-btn.wrong { border-color: var(--wrong); background: rgba(255,68,68,0.1); color: var(--wrong); }
+  .tf-btn.reveal { border-color: var(--correct); color: var(--correct); opacity: 0.6; }
+
+  .correction-note {
+    margin-top: 10px;
+    padding: 10px 14px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-family: 'Space Mono', monospace;
+    background: rgba(255,215,0,0.08);
+    border: 1px solid rgba(255,215,0,0.2);
+    color: var(--pending);
+    display: none;
+  }
+  .correction-note.show { display: block; }
+
+  /* ESSAY */
+  .essay-area {
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px 16px;
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    font-size: 14px;
+    resize: vertical;
+    min-height: 100px;
+    outline: none;
+    transition: border-color 0.2s;
+    line-height: 1.6;
+  }
+
+  .essay-area:focus { border-color: var(--accent3); }
+
+  .essay-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .check-btn {
+    padding: 10px 20px;
+    background: var(--accent3);
+    border: none;
+    border-radius: 6px;
+    color: #000;
+    font-family: 'Syne', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+
+  .check-btn:hover { opacity: 0.85; }
+
+  .model-answer {
+    margin-top: 12px;
+    padding: 12px 16px;
+    background: rgba(79,172,254,0.06);
+    border: 1px solid rgba(79,172,254,0.2);
+    border-radius: 8px;
+    font-size: 13px;
+    color: var(--accent3);
+    font-family: 'Space Mono', monospace;
+    line-height: 1.6;
+    display: none;
+    white-space: pre-wrap;
+  }
+
+  .model-answer.show { display: block; }
+  .model-answer strong { color: var(--text); font-family: 'Syne', sans-serif; display: block; margin-bottom: 6px; }
+
+  /* RESULTS SCREEN */
+  #results-screen {
+    display: none;
+    text-align: center;
+    padding: 60px 24px;
+    animation: fadeIn 0.5s ease;
+  }
+
+  .results-ring {
+    width: 160px;
+    height: 160px;
+    border-radius: 50%;
+    border: 4px solid var(--border);
+    margin: 0 auto 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    background: conic-gradient(var(--accent) 0%, var(--border) 0%);
+    transition: background 1s ease;
+  }
+
+  .results-ring-inner {
+    width: 130px;
+    height: 130px;
+    border-radius: 50%;
+    background: var(--bg);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .result-pct {
+    font-family: 'Space Mono', monospace;
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--accent);
+  }
+
+  .result-label { font-size: 11px; color: var(--muted); letter-spacing: 1px; }
+
+  .result-breakdown {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    margin-bottom: 32px;
+    flex-wrap: wrap;
+  }
+
+  .rb-item {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 24px;
+    min-width: 100px;
+  }
+
+  .rb-val {
+    font-family: 'Space Mono', monospace;
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+
+  .rb-val.g { color: var(--correct); }
+  .rb-val.r { color: var(--wrong); }
+  .rb-val.y { color: var(--pending); }
+
+  .rb-label { font-size: 11px; color: var(--muted); }
+
+  .restart-btn {
+    padding: 14px 36px;
+    background: var(--accent);
+    border: none;
+    border-radius: 8px;
+    color: #000;
+    font-family: 'Syne', sans-serif;
+    font-size: 15px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: opacity 0.2s, transform 0.1s;
+  }
+
+  .restart-btn:hover { opacity: 0.85; transform: scale(1.02); }
+
+  /* SHOW ALL btn */
+  .show-all-btn {
+    display: block;
+    width: 100%;
+    padding: 14px;
+    margin-top: 8px;
+    border: 1px dashed var(--border);
+    background: transparent;
+    color: var(--muted);
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: all 0.2s;
+  }
+  .show-all-btn:hover { border-color: var(--accent2); color: var(--accent2); }
+
+  .empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--muted);
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 1px;
+  }
+
+  /* FINISH BTN */
+  .finish-bar {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    z-index: 50;
+    background: rgba(13,13,13,0.97);
+    border-top: 1px solid var(--border);
+    padding: 14px 24px;
+    display: flex;
+    justify-content: center;
+  }
+
+  .finish-btn {
+    padding: 13px 48px;
+    background: linear-gradient(135deg, var(--accent), var(--accent3));
+    border: none;
+    border-radius: 8px;
+    color: #000;
+    font-family: 'Syne', sans-serif;
+    font-size: 15px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+
+  .finish-btn:hover { opacity: 0.85; }
+
+  @media (max-width: 600px) {
+    .q-card { padding: 16px; }
+    .option-btn { font-size: 13px; }
+    h1 { font-size: 26px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">● Python Course — Quiz System</div>
+  <h1>Study Quiz</h1>
+  <p class="subtitle">Ch.1 OOP &nbsp;|&nbsp; Ch.2 Data Structures &nbsp;|&nbsp; Ch.3 GUI</p>
+</header>
+
+<div class="score-bar">
+  <span class="score-info" id="score-label">Score: 0 / 0</span>
+  <div class="progress-wrap"><div class="progress-fill" id="progress-fill"></div></div>
+  <span class="score-num" id="answered-label">0 answered</span>
+</div>
+
+<div class="nav-section">
+  <div class="chapter-tabs" id="chapter-tabs"></div>
+  <div class="type-tabs" id="type-tabs"></div>
+</div>
+
+<main id="main-content"></main>
+
+<div class="finish-bar">
+  <button class="finish-btn" onclick="showResults()">🎯 Show My Results</button>
+</div>
+
+<script>
+// ============================================================
+// DATA
+// ============================================================
+const DATA = {
+  ch1: {
+    label: 'Chapter 1', subtitle: 'OOP',
+    mcq: [
+      { q: "What does OOP stand for?", opts: ["Object Oriented Process","Object Oriented Programming","Object Operating Program","Operating Object Program"], ans: 1 },
+      { q: "Objects in OOP represent:", opts: ["Real hardware only","Virtual representation of entities","Only numbers","Functions only"], ans: 1 },
+      { q: "OOP models functionalities through:", opts: ["Files","Variables only","Interaction among objects","Loops"], ans: 2 },
+      { q: "Abstraction in OOP means:", opts: ["Hiding data","Representing objects","Writing loops","Declaring variables"], ans: 1 },
+      { q: "Encapsulation is used to:", opts: ["Show all data","Hide internal implementation","Delete objects","Run programs"], ans: 1 },
+      { q: "Interface is considered as:", opts: ["Variable","Loop","Contract or blueprint","Data type"], ans: 2 },
+      { q: "If a class implements an interface, it must:", opts: ["Ignore methods","Follow its methods","Delete it","Change it"], ans: 1 },
+      { q: "A class describes:", opts: ["Functions only","Objects","Files","Numbers"], ans: 1 },
+      { q: "An object is:", opts: ["A function","An instance of a class","A loop","A file"], ans: 1 },
+      { q: "Class naming convention:", opts: ["snake_case","camelCase","CamelCase","lowercase"], ans: 2 },
+      { q: "Method naming convention:", opts: ["CamelCase","snake_case","UPPERCASE","PascalCase"], ans: 1 },
+      { q: "property() function is used to:", opts: ["Delete class","Create property","Run code","Import modules"], ans: 1 },
+      { q: "Inheritance allows:", opts: ["Code duplication","Code reuse","Deleting classes","Ignoring objects"], ans: 1 },
+      { q: "Subclass is:", opts: ["Parent class","Extended class","Interface","Variable"], ans: 1 },
+      { q: "Overriding means:", opts: ["Deleting method","Rewriting parent method","Ignoring class","Adding variable"], ans: 1 },
+      { q: "Multiple inheritance means:", opts: ["Inheriting from one class","Inheriting from two or more classes","No inheritance","Deleting classes"], ans: 1 },
+      { q: "A professor inheriting from Teacher and Researcher is an example of:", opts: ["Encapsulation","Abstraction","Multiple inheritance","Overriding"], ans: 2 },
+      { q: "The diamond problem occurs in:", opts: ["Single inheritance","Multiple inheritance","Encapsulation","Interfaces"], ans: 1 },
+      { q: "The diamond problem causes:", opts: ["Faster execution","Duplicate initialization","Data hiding","Code reuse"], ans: 1 },
+      { q: "Calling constructors twice leads to:", opts: ["Optimization","Bugs and resource waste","Faster code","No effect"], ans: 1 },
+      { q: "The solution to diamond problem in Python is:", opts: ["super()","delete class","loops","variables"], ans: 0 },
+      { q: "super() ensures:", opts: ["Manual calling","Correct order of initialization","Deleting parent","Ignoring inheritance"], ans: 1 },
+      { q: "*args is used for:", opts: ["Fixed arguments","Variable positional arguments","Keyword arguments only","No arguments"], ans: 1 },
+      { q: "**kwargs is used for:", opts: ["Positional arguments","Variable keyword arguments","No arguments","Loops"], ans: 1 },
+      { q: "Polymorphism means:", opts: ["One behavior","Same method with different behavior","No behavior","Only variables"], ans: 1 },
+      { q: "Overriding is a type of:", opts: ["Polymorphism","Encapsulation","Interface","Loop"], ans: 0 },
+      { q: "Python avoids overloading because:", opts: ["It is slow","Uses *args and **kwargs","It deletes methods","Not possible"], ans: 1 },
+      { q: "Operator overloading allows:", opts: ["Changing operator behavior","Deleting operators","Ignoring operators","Creating loops"], ans: 0 },
+      { q: "'+' operator can:", opts: ["Only add numbers","Work with different data types","Delete variables","Stop execution"], ans: 1 },
+      { q: "Abstract methods must be:", opts: ["Ignored","Implemented in subclass","Deleted","Hidden"], ans: 1 },
+      { q: "UML is used for:", opts: ["Writing code","Visualizing system design","Debugging only","Running programs"], ans: 1 },
+      { q: "Class diagrams represent:", opts: ["Only variables","Classes, attributes, and methods","Only functions","Only loops"], ans: 1 },
+      // From chapter_1.pdf
+      { q: "_____ represents an entity in the real world with its identity and behaviour.", opts: ["A method","An object","A class","An operator"], ans: 1 },
+      { q: "_____ is used to create an object.", opts: ["class","constructor","User-defined functions","In-built functions"], ans: 1 },
+      { q: "What is Instantiation in terms of OOP terminology?", opts: ["Deleting an instance of class","Modifying an instance of class","Copying an instance of class","Creating an instance of class"], ans: 3 },
+      { q: "Which of these is NOT a fundamental feature of OOP?", opts: ["Encapsulation","Inheritance","Instantiation","Polymorphism"], ans: 2 },
+      { q: "Which of the following is the most suitable definition for encapsulation?", opts: ["Ability of a class to derive members of another class","Bundling instance variables and methods to restrict access","Focuses on passing variables to functions","Allows implementation of elegant software"], ans: 1 },
+      { q: "Methods that provide access to private members of a class are called:", opts: ["getters/setters","__repr__/__str__","user-defined functions/in-built functions","__init__/__del__"], ans: 0 },
+      { q: "Which of these is a private data field (given: __a, self.__b, self.__c__, __d__=1)?", opts: ["__a","self.__b","self.__c__","__d__"], ans: 1 },
+      { q: "What is an abstract class?", opts: ["A class that cannot be modified","A class created only to be inherited, not instantiated","A class with no methods","A class with only private attributes"], ans: 1 },
+      { q: "What is the relationship between classes and objects?", opts: ["Classes are instances of objects","Objects describe classes","Classes describe objects; each object is an instance of a class","There is no relationship"], ans: 2 },
+      { q: "What is the purpose of the __init__ method?", opts: ["To destroy the instance","To initialize the instance by setting attributes","To create a new class","To define abstract methods"], ans: 1 },
+      { q: "What does a single underscore prefix (_attribute) indicate?", opts: ["Completely private","Convention suggesting it should be treated as private","Built-in attribute","Class method"], ans: 1 },
+      { q: "What is composition in OOP?", opts: ["Objects exist independently","An object composed of others that cease when the container ceases","A class inherits from multiple classes","Methods are shared between classes"], ans: 1 },
+      { q: "What is aggregation in OOP?", opts: ["Objects are tightly coupled","A set of objects compose another but may exist independently","Same as inheritance","Same as composition"], ans: 1 },
+      { q: "What is method overriding?", opts: ["Creating multiple methods with the same name","Modifying a superclass method in a subclass","Deleting a method from superclass","Making a method private"], ans: 1 },
+      { q: "What is the Diamond Problem in multiple inheritance?", opts: ["A class has too many methods","A subclass inherits from two classes with a common ancestor causing duplicate initialization","Classes cannot be instantiated","Methods conflict with attribute names"], ans: 1 },
+      { q: "What is polymorphism?", opts: ["Ability to create multiple classes","Ability to call a method with same name but different behavior in subclasses","Ability to hide data","Ability to create multiple instances"], ans: 1 },
+    ],
+    tf: [
+      { q: "OOP uses interaction between objects.", ans: true },
+      { q: "Encapsulation exposes internal implementation.", ans: false, correction: "Encapsulation HIDES internal implementation." },
+      { q: "Interface is like a contract.", ans: true },
+      { q: "An object is not related to a class.", ans: false, correction: "An object IS related to a class — it's an instance of it." },
+      { q: "Classes are instances of objects.", ans: false, correction: "Objects are instances of classes, not the other way around." },
+      { q: "Inheritance helps reduce code repetition.", ans: true },
+      { q: "Overriding means adding a new class.", ans: false, correction: "Overriding means rewriting a parent class method in a subclass." },
+      { q: "Multiple inheritance allows a class to inherit from more than one class.", ans: true },
+      { q: "super() is not useful in multiple inheritance.", ans: false, correction: "super() IS very useful — it ensures correct order of initialization." },
+      { q: "*args accepts unlimited positional arguments.", ans: true },
+      { q: "**kwargs accepts keyword arguments.", ans: true },
+      { q: "Polymorphism means same behavior always.", ans: false, correction: "Polymorphism means DIFFERENT behavior depending on the object." },
+      { q: "Python fully supports method overloading.", ans: false, correction: "Python doesn't support overloading; uses *args/**kwargs instead." },
+      { q: "Abstract classes can be instantiated directly.", ans: false, correction: "Abstract classes CANNOT be instantiated directly." },
+      { q: "UML diagrams help visualize systems.", ans: true },
+      { q: "Class diagrams include methods and attributes.", ans: true },
+      // From chapter_1.pdf
+      { q: "Python supports method overloading.", ans: false, correction: "Python doesn't support overloading — uses *args and **kwargs instead." },
+      { q: "Attributes that start with double underscore __ are treated as Protected.", ans: false, correction: "Double underscore __ attributes are treated as PRIVATE (name mangling)." },
+      { q: "The self keyword refers to the class itself.", ans: false, correction: "self refers to the current object (instance) of the class." },
+      { q: "Inheritance allows a class to reuse attributes and methods from another class.", ans: true },
+      { q: "Property decorator is used for defining a method as an attribute.", ans: true },
+      { q: "Private members of a class cannot be accessed.", ans: false, correction: "Private members CAN be accessed via getters/setters or name mangling." },
+      { q: "The purpose of name mangling is to avoid unintentional access of private class members.", ans: true },
+      { q: "Overriding means changing behaviour of methods of derived class methods in the base class.", ans: false, correction: "Overriding means changing the behavior in the SUBCLASS, not the base class." },
+    ],
+    essay: [
+      { q: "What is Abstraction?", ans: "Abstraction is the concept of representing objects while hiding unnecessary details and showing only essential features." },
+      { q: "What are the Core Principles of OOP in Python?", ans: "The four core principles are:\n1. Encapsulation — hiding internal implementation\n2. Abstraction — showing only essential features\n3. Inheritance — reusing attributes/methods from parent class\n4. Polymorphism — same method name, different behavior" },
+      { q: "Explain Encapsulation.", ans: "Encapsulation is hiding internal implementation and protecting data. It bundles instance variables and methods together to restrict access to certain class members." },
+      { q: "What is an Interface?", ans: "An interface is a contract or blueprint that defines methods a class must implement. Any class that implements it must follow all its methods." },
+      { q: "Define Class and Object.", ans: "A class is a blueprint for creating objects. It defines attributes and methods. An object is an instance of a class — a concrete realization of the blueprint." },
+      { q: "Explain Inheritance.", ans: "Inheritance allows a subclass to reuse attributes and methods from a parent class, reducing code duplication and promoting reusability." },
+      { q: "Explain Multiple Inheritance.", ans: "Multiple inheritance allows a class to inherit from more than one parent class, enabling reuse of multiple functionalities. Example: a Professor class inheriting from both Teacher and Researcher." },
+      { q: "What is the Diamond Problem?", ans: "It occurs in multiple inheritance when a base class is inherited by two subclasses, and those subclasses are inherited again by one final class. The base class initializer may be called multiple times, causing bugs and resource waste." },
+      { q: "Explain the solution to the Diamond Problem.", ans: "Using super() ensures proper order of method calls (MRO — Method Resolution Order) and avoids duplicate execution of __init__ methods." },
+      { q: "What are *args and **kwargs?", ans: "*args allows passing a variable number of positional arguments to a function.\n**kwargs allows passing a variable number of keyword arguments.\nThese make Python flexible and reduce the need for method overloading." },
+      { q: "Define Polymorphism.", ans: "Polymorphism allows methods to have the same name but behave differently depending on the object calling them. It is achieved through overriding and operator overloading." },
+      { q: "Explain Overriding.", ans: "Overriding is redefining a parent class method in a subclass to change or extend its behavior. The subclass version replaces the parent's version when called on a subclass object." },
+      { q: "Why doesn't Python support method overloading?", ans: "Because Python uses flexible arguments (*args, **kwargs), which allow a single method to handle multiple argument types and counts, making overloading unnecessary." },
+      { q: "Describe the Diamond Problem and its solution (with diagram structure).", ans: "The Diamond Problem occurs when:\n- ClassB is a base class\n- LeftSubClass and RightSubClass both inherit from ClassB\n- SubClassA inherits from both LeftSubClass and RightSubClass\n\nThis causes ClassB.__init__() to be called twice.\n\nSolution: Use super() in all classes' __init__() methods to follow the MRO (Method Resolution Order), ensuring each class is initialized only once." },
+    ]
+  },
+  ch2: {
+    label: 'Chapter 2', subtitle: 'Data Structures',
+    mcq: [
+      { q: "A data structure is used to:", opts: ["Delete data","Manage and organize data efficiently","Print output","Run loops"], ans: 1 },
+      { q: "Data structures are closely related to:", opts: ["Networking","OOP","Hardware","OS"], ans: 1 },
+      { q: "Adding attributes dynamically in Python is:", opts: ["Recommended","Efficient","Discouraged","Required"], ans: 2 },
+      { q: "Dynamic attributes cause:", opts: ["Better performance","Memory waste","Faster code","No issues"], ans: 1 },
+      { q: "Tuples are:", opts: ["Mutable","Immutable","Dynamic","Flexible"], ans: 1 },
+      { q: "Tuples can be used as dictionary keys because they are:", opts: ["Mutable","Hashable","Lists","Dynamic"], ans: 1 },
+      { q: "Lists are:", opts: ["Immutable","Mutable","Fixed","Static"], ans: 1 },
+      { q: "Slicing syntax is:", opts: ["[start:end]","[start:stop:step]","[index]","[step]"], ans: 1 },
+      { q: "data[::-1] is used to:", opts: ["Sort","Reverse","Delete","Copy"], ans: 1 },
+      { q: "append() does:", opts: ["Remove item","Add one element","Sort list","Reverse list"], ans: 1 },
+      { q: "extend() is used to:", opts: ["Add one element","Merge lists","Delete items","Reverse list"], ans: 1 },
+      { q: "sort() function:", opts: ["Returns sorted list","Sorts in-place","Deletes list","Copies list"], ans: 1 },
+      { q: "Stack follows:", opts: ["FIFO","LIFO","Random","None"], ans: 1 },
+      { q: "Queue follows:", opts: ["LIFO","FIFO","Random","Stack"], ans: 1 },
+      { q: "Efficient queue in Python uses:", opts: ["List","Tuple","deque","Set"], ans: 2 },
+      { q: "Linked list consists of:", opts: ["Arrays","Nodes","Loops","Functions"], ans: 1 },
+      { q: "Root in a tree is:", opts: ["Last node","First/top node","Middle node","Leaf"], ans: 1 },
+      { q: "BFS uses:", opts: ["Stack","Queue","List","Tuple"], ans: 1 },
+      // From chapter_2.pdf
+      { q: "Lists in Python are:", opts: ["Immutable","Fixed size","Mutable","Hashable"], ans: 2 },
+      { q: "Which function adds an element at a specific index in the list?", opts: ["append()","extend()","insert()","sort()"], ans: 2 },
+      { q: "Tuples can be used as keys in dictionaries because they are:", opts: ["Mutable","Hashable","Iterable","Ordered"], ans: 1 },
+      { q: "What does slicing [::-1] do?", opts: ["Return the last element","Reverses sequence","Removes duplicate values","Return first element"], ans: 1 },
+      { q: "Queue uses which structure for efficiency?", opts: ["list","set","deque","tuple"], ans: 2 },
+      { q: "Which data structure is best for reversing data?", opts: ["Queue","Stack","Tree","LinkedList"], ans: 1 },
+      { q: "What is the time complexity of pop(0) in a list?", opts: ["O(1)","O(log n)","O(n)","O(n²)"], ans: 2 },
+      { q: "In a tree, nodes with no children are called:", opts: ["Root","Internal","Leaf","Parent"], ans: 2 },
+      { q: "Which node has no parent?", opts: ["Leaf","Internal","Root","Child"], ans: 2 },
+      { q: "Depth of a node means:", opts: ["Number of its children","Number of ancestors between node and root","Total nodes in tree","Height of tree"], ans: 1 },
+      { q: "Which of the following describes an internal node?", opts: ["A node with no children","A node with no parent","A node that is neither root nor leaf","A node with only one child"], ans: 2 },
+      { q: "Binary tree node has maximum:", opts: ["1 child","2 children","3 children","Unlimited"], ans: 1 },
+      { q: "Pre-order traversal visits nodes in what order?", opts: ["Root → Left → Right","Left → Root → Right","Right → Left → Root","Root → Right → Left"], ans: 0 },
+      { q: "In-order traversal visits nodes in what order?", opts: ["Root → Left → Right","Left → Root → Right","Right → Left → Root","Root → Right → Left"], ans: 1 },
+      { q: "Post-order traversal visits nodes in what order?", opts: ["Root → Left → Right","Left → Root → Right","Left → Right → Root","Root → Right → Left"], ans: 2 },
+    ],
+    tf: [
+      { q: "Data structures improve efficiency.", ans: true },
+      { q: "Dynamic attributes improve maintainability.", ans: false, correction: "Dynamic attributes REDUCE maintainability and waste memory." },
+      { q: "Tuples can be modified.", ans: false, correction: "Tuples are immutable — they cannot be modified after creation." },
+      { q: "Lists are flexible.", ans: true },
+      { q: "append() adds multiple elements.", ans: false, correction: "append() adds only ONE element. extend() adds multiple." },
+      { q: "Stack works as FIFO.", ans: false, correction: "Stack works as LIFO (Last In, First Out). Queue is FIFO." },
+      { q: "Queue works as FIFO.", ans: true },
+      { q: "deque is efficient for queues.", ans: true },
+      { q: "Trees are linear structures.", ans: false, correction: "Trees are hierarchical (non-linear) structures." },
+      { q: "DFS uses stack.", ans: true },
+      // From chapter_2.pdf
+      { q: "In Python, adding attributes 'on-the-fly' always improves memory usage.", ans: false, correction: "It consumes memory and reduces code readability and maintainability." },
+      { q: "In Python, you can modify elements inside a tuple after creation.", ans: false, correction: "Tuples are immutable — elements cannot be changed after creation." },
+      { q: "collections.deque provides O(1) performance for queue operations.", ans: true },
+      { q: "BFS uses a Stack to track nodes.", ans: false, correction: "BFS uses a QUEUE, not a Stack. DFS uses a Stack." },
+    ],
+    essay: [
+      { q: "What is a Data Structure?", ans: "A data structure is a way to organize and manage data efficiently for better performance and usability." },
+      { q: "Why are dynamic attributes discouraged?", ans: "Because they waste memory and reduce code readability and maintainability. It's better to define all attributes in __init__." },
+      { q: "Difference between List and Tuple.", ans: "Lists are mutable (can be changed) and flexible.\nTuples are immutable (cannot be changed) and fixed.\nTuples can be used as dictionary keys because they are hashable; lists cannot." },
+      { q: "Explain slicing in Python.", ans: "Slicing allows accessing parts of a sequence using [start:stop:step]. Examples:\n- data[1:4] → elements from index 1 to 3\n- data[::-1] → reverses the sequence\n- data[::2] → every other element" },
+      { q: "Explain Stack and Queue.", ans: "Stack follows LIFO (Last In, First Out) — like a stack of plates. The last item added is the first removed.\n\nQueue follows FIFO (First In, First Out) — like a queue of people. The first item added is the first removed." },
+      { q: "Why is deque preferred for queues?", ans: "Because deque (double-ended queue from the collections module) provides O(1) performance for both insertion and deletion at both ends, while a regular list's pop(0) is O(n)." },
+      { q: "What is a Linked List?", ans: "A data structure made of nodes, where each node contains data and a pointer to the next node. Unlike arrays, linked lists don't require contiguous memory." },
+      { q: "Explain Tree structure.", ans: "A hierarchical (non-linear) data structure with:\n- Root: the top node with no parent\n- Internal nodes: nodes with at least one child\n- Leaf nodes: nodes with no children\n- Children: nodes directly connected below a parent" },
+      { q: "Difference between BFS and DFS.", ans: "BFS (Breadth-First Search): explores level by level using a QUEUE.\nDFS (Depth-First Search): explores as deep as possible first using a STACK.\n\nBFS finds shortest paths; DFS is useful for exploring all paths." },
+      { q: "Explain tree traversal methods (Pre-order, In-order, Post-order).", ans: "Pre-order: Root → Left → Right\nIn-order: Left → Root → Right (gives sorted output for BST)\nPost-order: Left → Right → Root\n\nEach method visits nodes in a different sequence, useful for different operations." },
+    ]
+  },
+  ch3: {
+    label: 'Chapter 3', subtitle: 'GUI / PyQt',
+    mcq: [
+      { q: "What is the main purpose of a Graphical User Interface (GUI)?", opts: ["To force users to type commands","To allow visual interaction with software","To make programs run slower","To simplify server-side logic"], ans: 1 },
+      { q: "Which interaction model describes a GUI program?", opts: ["Predictable flow","Command Line Interface","Event-driven architecture","Linear execution"], ans: 2 },
+      { q: "Which of the following is considered an Event Source in PyQt?", opts: ["Target Object","Keyboard","Event Object","Memory Address"], ans: 1 },
+      { q: "What is the core logic module in PyQt used for files, time, and URLs?", opts: ["QtGui","QtNetwork","QtCore","QtSql"], ans: 2 },
+      { q: "Which module is used to create interface elements like buttons and windows?", opts: ["AQtXml","QtGui","QtOpenGL","QtSvg"], ans: 1 },
+      { q: "Every PyQt application must have exactly one of which object?", opts: ["QWidget","QAction","QApplication","QLayout"], ans: 2 },
+      { q: "What method is called to start the event loop in a PyQt application?", opts: ["start()","show()","run()","exec_()"], ans: 3 },
+      { q: "Which widget is used primarily to display text that the user cannot edit?", opts: ["QLineEdit","QLabel","QPushButton","QAction"], ans: 1 },
+      { q: "If you want to take a single line of text input from a user, which widget should you use?", opts: ["QLineEdit","QLabel","QMainWindow","QStatusBar"], ans: 0 },
+      { q: "What character is used in a button label to define a shortcut key?", opts: ["$","#","&","%"], ans: 2 },
+      { q: "What is the main disadvantage of using the .move() method for positioning widgets?", opts: ["It is too fast","It uses too much memory","It breaks when the window is resized","It only works on Linux"], ans: 2 },
+      { q: "Which layout manager arranges widgets in a vertical column?", opts: ["QHBoxLayout","QGridLayout","QVBoxLayout","QStackLayout"], ans: 2 },
+      { q: "Which layout manager is described as being like a table?", opts: ["QVBoxLayout","QGridLayout","QHBoxLayout","QFormLayout"], ans: 1 },
+      { q: "In the Signal and Slot concept, what is a 'Slot'?", opts: ["An event fired by a widget","A visual border around a button","A function executed in response to a signal","A memory location for variables"], ans: 2 },
+      { q: "What does the triggered.connect() method do?", opts: ["It deletes the action","It binds an event to a specific command/function","It minimizes the window","It installs the library"], ans: 1 },
+      { q: "Which class provides a full app structure including a menu bar, toolbar, and status bar?", opts: ["QWidget","QDialog","QMainWindow","QFrame"], ans: 2 },
+      { q: "What file extension is used for files saved by Qt Designer?", opts: [".py",".exe",".ui",".txt"], ans: 2 },
+      { q: "Which module would you use if your PyQt application needed to interact with a database?", opts: ["QtSql","QtNetwork","QtGui","QtCore"], ans: 0 },
+      { q: "To show a window on the screen, which method must be called on the widget?", opts: ["display()","open()","show()","visible(True)"], ans: 2 },
+      { q: "Which of the following is a feature of Qt Designer?", opts: ["Automatically writes all backend logic","Drag and drop widget placement","Compiles Python to C++ automatically","Only supports labels and no buttons"], ans: 1 },
+      { q: "What is a 'Signal' in PyQt?", opts: ["A function that processes data","An event notification fired by an object","A type of layout","A specific color for buttons"], ans: 1 },
+      { q: "In GUI development, what does 'CLI' stand for?", opts: ["Computer Language Interface","Central Logic Integration","Command Line Interface","Common Layout Industry"], ans: 2 },
+    ],
+    tf: [
+      { q: "GUI programs use event-driven architecture.", ans: true },
+      { q: "CLI programs always depend on visual interaction.", ans: false, correction: "CLI programs use text commands, NOT visual interaction." },
+      { q: "QtCore handles logic and files.", ans: true },
+      { q: "exec_() starts the event loop.", ans: true },
+      { q: "QLabel is mainly used for user input.", ans: false, correction: "QLabel is used to DISPLAY text; QLineEdit is used for input." },
+      { q: "Layouts help solve resizing problems.", ans: true },
+      { q: "QVBoxLayout arranges widgets horizontally.", ans: false, correction: "QVBoxLayout arranges widgets VERTICALLY. QHBoxLayout is horizontal." },
+      { q: "Signals and Slots are used for communication between objects.", ans: true },
+      { q: "Qt Designer requires coding initially.", ans: false, correction: "Qt Designer uses drag-and-drop without initial coding." },
+      { q: "Mouse and keyboard actions are examples of events.", ans: true },
+    ],
+    essay: [
+      { q: "Define GUI and explain why it is important.", ans: "GUI (Graphical User Interface) allows users to interact visually with software using elements like buttons, menus, and windows. It makes applications more user-friendly and accessible compared to command-line interfaces." },
+      { q: "Explain the concept of event-driven architecture.", ans: "In event-driven architecture, programs don't execute in a fixed order. Instead, they wait for user events (clicks, key presses, etc.) and react dynamically when those events occur. This is how all GUI applications work." },
+      { q: "What is PyQt and why is it useful?", ans: "PyQt is a Python library (binding for the Qt framework) used to build graphical user interfaces efficiently. It provides ready-made widgets and tools to create cross-platform desktop applications." },
+      { q: "Explain the role of QApplication.", ans: "QApplication manages the entire application flow and the event loop. Every PyQt application must have exactly one QApplication instance. It handles system events and keeps the app running until the user closes it." },
+      { q: "Describe Signals and Slots in PyQt.", ans: "Signals are notifications fired by widgets when something happens (e.g., button clicked). Slots are functions that execute in response to a signal. They are connected using .connect(). Example: button.clicked.connect(my_function)" },
+      { q: "Explain how buttons and events work together in GUI applications.", ans: "Buttons (QPushButton) emit signals when interacted with. These signals are connected to slot functions. When a user clicks a button, the signal triggers the slot, which executes the corresponding action." },
+      { q: "List and explain the modules of PyQt.", ans: "QtCore — Core logic: files, time, URLs, basic data types\nQtGui — GUI elements: buttons, windows, widgets\nQtNetwork — Network operations\nQtSql — Database interaction\nQtXml — XML processing\nQtSvg — SVG rendering\nQtOpenGL — 3D/OpenGL graphics" },
+    ]
+  }
+};
+
+// ============================================================
+// STATE
+// ============================================================
+let currentChapter = 'ch1';
+let currentType = 'mcq';
+let answers = {}; // key: "ch-type-idx" => { selected, correct }
+let essayShown = {}; // key: "ch-type-idx" => true/false
+
+function getKey(ch, type, idx) { return `${ch}-${type}-${idx}`; }
+
+function getStats() {
+  let total = 0, correct = 0, answered = 0;
+  for (const [key, val] of Object.entries(answers)) {
+    if (val.correct !== undefined) {
+      total++;
+      answered++;
+      if (val.correct) correct++;
+    }
+  }
+  // Count essay shown as answered
+  for (const key of Object.keys(essayShown)) {
+    answered++;
+    total++;
+  }
+  return { total, correct, answered };
+}
+
+function getTotalQuestions() {
+  let t = 0;
+  for (const ch of Object.values(DATA)) {
+    t += ch.mcq.length + ch.tf.length + ch.essay.length;
+  }
+  return t;
+}
+
+function updateScoreBar() {
+  let correct = 0, answered = 0;
+  for (const val of Object.values(answers)) {
+    if (val.correct !== undefined) { answered++; if (val.correct) correct++; }
+  }
+  const essayCount = Object.keys(essayShown).length;
+  answered += essayCount;
+  const total = getTotalQuestions();
+  document.getElementById('score-label').textContent = `Score: ${correct} / ${answered}`;
+  document.getElementById('answered-label').textContent = `${answered} / ${total} answered`;
+  const pct = (answered / total) * 100;
+  document.getElementById('progress-fill').style.width = pct + '%';
+}
+
+// ============================================================
+// RENDER NAV
+// ============================================================
+function renderNav() {
+  const cTabs = document.getElementById('chapter-tabs');
+  cTabs.innerHTML = '';
+  for (const [key, ch] of Object.entries(DATA)) {
+    const btn = document.createElement('button');
+    btn.className = 'chapter-btn' + (key === currentChapter ? ' active' : '');
+    btn.textContent = ch.label + ' — ' + ch.subtitle;
+    btn.onclick = () => { currentChapter = key; renderNav(); renderContent(); };
+    cTabs.appendChild(btn);
+  }
+
+  const tTabs = document.getElementById('type-tabs');
+  tTabs.innerHTML = '';
+  const types = [
+    { key: 'mcq', label: '📝 Multiple Choice' },
+    { key: 'tf', label: '✅ True / False' },
+    { key: 'essay', label: '✍️ Essay' },
+  ];
+  for (const t of types) {
+    const btn = document.createElement('button');
+    btn.className = 'type-btn' + (t.key === currentType ? ' active' : '');
+    btn.textContent = t.label;
+    btn.onclick = () => { currentType = t.key; renderNav(); renderContent(); };
+    tTabs.appendChild(btn);
+  }
+}
+
+// ============================================================
+// RENDER CONTENT
+// ============================================================
+function renderContent() {
+  const main = document.getElementById('main-content');
+  const ch = DATA[currentChapter];
+  const questions = ch[currentType];
+
+  if (!questions || questions.length === 0) {
+    main.innerHTML = '<div class="empty-state">NO QUESTIONS IN THIS SECTION</div>';
+    return;
+  }
+
+  const tagLabel = currentType === 'mcq' ? 'MCQ' : currentType === 'tf' ? 'T/F' : 'Essay';
+  const tagClass = currentType === 'mcq' ? '' : currentType === 'tf' ? 'tf' : 'essay';
+
+  let html = `<div class="section-header">
+    <span class="section-tag ${tagClass}">${tagLabel}</span>
+    <span class="section-title">${ch.label} — ${ch.subtitle}</span>
+    <span class="q-count">${questions.length} questions</span>
+  </div>`;
+
+  questions.forEach((q, idx) => {
+    const key = getKey(currentChapter, currentType, idx);
+    if (currentType === 'mcq') {
+      html += renderMCQ(q, idx, key);
+    } else if (currentType === 'tf') {
+      html += renderTF(q, idx, key);
+    } else {
+      html += renderEssay(q, idx, key);
+    }
+  });
+
+  main.innerHTML = html;
+}
+
+function renderMCQ(q, idx, key) {
+  const saved = answers[key];
+  const letters = ['A','B','C','D'];
+  let optHtml = '';
+  q.opts.forEach((opt, oi) => {
+    let cls = '';
+    if (saved !== undefined) {
+      if (oi === q.ans) cls = 'correct';
+      else if (oi === saved.selected) cls = 'wrong';
+    }
+    optHtml += `<button class="option-btn ${cls}" ${saved !== undefined ? 'disabled' : ''} onclick="answerMCQ('${key}',${idx},${oi},${q.ans})">
+      <span class="option-letter">${letters[oi]}</span>${opt}
+    </button>`;
+  });
+
+  let feedbackHtml = '';
+  if (saved !== undefined) {
+    const correct = saved.correct;
+    feedbackHtml = `<div class="feedback ${correct ? 'correct' : 'wrong'} show">
+      ${correct ? '✓ Correct!' : `✗ Wrong. Correct answer: ${letters[q.ans]}) ${q.opts[q.ans]}`}
+    </div>`;
+  }
+
+  const cardCls = saved !== undefined ? (saved.correct ? 'answered-correct' : 'answered-wrong') : '';
+
+  return `<div class="q-card ${cardCls}" id="card-${key}">
+    <div class="q-num">QUESTION ${idx+1}</div>
+    <div class="q-text">${q.q}</div>
+    <div class="options">${optHtml}</div>
+    ${feedbackHtml}
+  </div>`;
+}
+
+function renderTF(q, idx, key) {
+  const saved = answers[key];
+  let trueCls = '', falseCls = '';
+  if (saved !== undefined) {
+    if (q.ans === true) { trueCls = 'correct'; falseCls = saved.selected === false ? 'wrong' : ''; }
+    else { falseCls = 'correct'; trueCls = saved.selected === true ? 'wrong' : ''; }
+    // show reveal on the correct one if user was wrong
+    if (saved.selected === true && q.ans === false) { falseCls = 'reveal'; }
+    if (saved.selected === false && q.ans === true) { trueCls = 'reveal'; }
+  }
+
+  let correctionHtml = '';
+  if (saved !== undefined && !saved.correct && q.correction) {
+    correctionHtml = `<div class="correction-note show">📌 ${q.correction}</div>`;
+  }
+
+  const cardCls = saved !== undefined ? (saved.correct ? 'answered-correct' : 'answered-wrong') : '';
+
+  return `<div class="q-card ${cardCls}" id="card-${key}">
+    <div class="q-num">QUESTION ${idx+1}</div>
+    <div class="q-text">${q.q}</div>
+    <div class="tf-options">
+      <button class="tf-btn true-btn ${trueCls}" ${saved !== undefined ? 'disabled' : ''} onclick="answerTF('${key}',${idx},true,${q.ans})">✓ True</button>
+      <button class="tf-btn false-btn ${falseCls}" ${saved !== undefined ? 'disabled' : ''} onclick="answerTF('${key}',${idx},false,${q.ans})">✗ False</button>
+    </div>
+    ${correctionHtml}
+    ${saved !== undefined ? `<div class="feedback ${saved.correct ? 'correct' : 'wrong'} show">${saved.correct ? '✓ Correct!' : '✗ Wrong!'}</div>` : ''}
+  </div>`;
+}
+
+function renderEssay(q, idx, key) {
+  const shown = essayShown[key];
+  const savedText = answers[key]?.text || '';
+
+  return `<div class="q-card ${shown ? 'answered-partial' : ''}" id="card-${key}">
+    <div class="q-num">QUESTION ${idx+1}</div>
+    <div class="q-text">${q.q}</div>
+    <textarea class="essay-area" id="essay-${key}" placeholder="Write your answer here..." ${shown ? 'disabled' : ''}>${savedText}</textarea>
+    <div class="essay-actions">
+      ${!shown ? `<button class="check-btn" onclick="showEssayAnswer('${key}','${idx}')">Show Model Answer</button>` : '<span style="font-size:12px;color:var(--muted);font-family:Space Mono">Answer revealed ✓</span>'}
+    </div>
+    <div class="model-answer ${shown ? 'show' : ''}" id="model-${key}">
+      <strong>📋 Model Answer:</strong>${q.ans}
+    </div>
+  </div>`;
+}
+
+// ============================================================
+// ANSWER HANDLERS
+// ============================================================
+function answerMCQ(key, idx, selected, correct) {
+  const ta = document.getElementById(`essay-${key}`);
+  if (answers[key] !== undefined) return;
+  answers[key] = { selected, correct: selected === correct };
+  updateScoreBar();
+  // Re-render just this card
+  const ch = DATA[currentChapter];
+  const q = ch.mcq[idx];
+  const card = document.getElementById(`card-${key}`);
+  if (!card) return;
+  const newCard = document.createElement('div');
+  newCard.innerHTML = renderMCQ(q, idx, key);
+  card.replaceWith(newCard.firstChild);
+}
+
+function answerTF(key, idx, selected, correctVal) {
+  if (answers[key] !== undefined) return;
+  const correct = selected === correctVal;
+  answers[key] = { selected, correct };
+  updateScoreBar();
+  const ch = DATA[currentChapter];
+  const q = ch.tf[idx];
+  const card = document.getElementById(`card-${key}`);
+  if (!card) return;
+  const newCard = document.createElement('div');
+  newCard.innerHTML = renderTF(q, idx, key);
+  card.replaceWith(newCard.firstChild);
+}
+
+function showEssayAnswer(key, idx) {
+  const ta = document.getElementById(`essay-${key}`);
+  if (ta) answers[key] = { text: ta.value };
+  essayShown[key] = true;
+  updateScoreBar();
+  const ch = DATA[currentChapter];
+  const q = ch.essay[parseInt(idx)];
+  const card = document.getElementById(`card-${key}`);
+  if (!card) return;
+  const newCard = document.createElement('div');
+  newCard.innerHTML = renderEssay(q, parseInt(idx), key);
+  card.replaceWith(newCard.firstChild);
+}
+
+// ============================================================
+// RESULTS
+// ============================================================
+function showResults() {
+  let correct = 0, wrong = 0, essay = 0;
+  for (const val of Object.values(answers)) {
+    if (val.correct === true) correct++;
+    else if (val.correct === false) wrong++;
+  }
+  essay = Object.keys(essayShown).length;
+  const total = getTotalQuestions();
+  const pct = Math.round(((correct + essay) / total) * 100);
+
+  document.getElementById('main-content').style.display = 'none';
+  document.querySelector('.nav-section').style.display = 'none';
+  document.querySelector('.finish-bar').style.display = 'none';
+
+  const resultsEl = document.getElementById('results-screen');
+  resultsEl.style.display = 'block';
+  resultsEl.innerHTML = `
+    <div style="font-family:'Space Mono',monospace;font-size:10px;letter-spacing:3px;color:var(--muted);margin-bottom:24px;">QUIZ COMPLETE</div>
+    <div class="results-ring" id="results-ring">
+      <div class="results-ring-inner">
+        <div class="result-pct">${pct}%</div>
+        <div class="result-label">SCORE</div>
+      </div>
+    </div>
+    <div class="result-breakdown">
+      <div class="rb-item"><div class="rb-val g">${correct}</div><div class="rb-label">Correct</div></div>
+      <div class="rb-item"><div class="rb-val r">${wrong}</div><div class="rb-label">Wrong</div></div>
+      <div class="rb-item"><div class="rb-val y">${essay}</div><div class="rb-label">Essay Revealed</div></div>
+      <div class="rb-item"><div class="rb-val" style="color:var(--text)">${total}</div><div class="rb-label">Total Questions</div></div>
+    </div>
+    <div style="color:var(--muted);font-size:14px;margin-bottom:32px;">
+      ${pct >= 80 ? '🎉 Excellent work! You\'re well prepared.' : pct >= 60 ? '👍 Good job! Review the ones you missed.' : '📚 Keep studying! You\'ll get there.'}
+    </div>
+    <button class="restart-btn" onclick="restartQuiz()">↩ Back to Quiz</button>
+  `;
+
+  // Animate ring
+  setTimeout(() => {
+    const ring = document.getElementById('results-ring');
+    if (ring) ring.style.background = `conic-gradient(var(--accent) ${pct}%, var(--border) ${pct}%)`;
+  }, 200);
+}
+
+function restartQuiz() {
+  document.getElementById('results-screen').style.display = 'none';
+  document.getElementById('main-content').style.display = 'block';
+  document.querySelector('.nav-section').style.display = 'block';
+  document.querySelector('.finish-bar').style.display = 'flex';
+}
+
+// ============================================================
+// INIT
+// ============================================================
+window.onload = function() {
+  renderNav();
+  renderContent();
+  updateScoreBar();
+};
+</script>
+
+<div id="results-screen"></div>
+
+</body>
+</html>
